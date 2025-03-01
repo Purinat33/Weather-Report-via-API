@@ -14,6 +14,11 @@ api_key = getenv("API_KEY")
 app = tk.Tk()
 app.title("Weather Report")
 
+
+# Frame
+frame = tk.Frame(app)
+frame.pack(side=tk.BOTTOM)
+
 welcome_label = tk.Label(
     app, text="Current Weather Report", font=("Ariel", 20)
 )
@@ -44,7 +49,7 @@ def return_weather(id):
     print('\n')
     print(data)
     tempC = data['current']['temp_c']
-    label_tempC = tk.Label(app, text=f"Temperature: {tempC} Celcius")
+    label_tempC = tk.Label(frame, text=f"Temperature: {tempC} Celcius")
     label_tempC.pack()
 
 # Search button
@@ -54,6 +59,10 @@ def return_weather(id):
 
 
 def search_city():
+    if search_city_body.compare("end-1c", "==", "1.0"):
+        print("empty text")
+        return
+
     city_query = search_city_body.get("1.0", tk.END).strip().lower()
     print(city_query)
     # This seems like a security breach
@@ -67,13 +76,13 @@ def search_city():
     # https://www.tutorialspoint.com/get-the-tkinter-entry-from-a-loop
     for i in range(len(results.json())):
         search_result_name = tk.Label(
-            app, text=f"{results.json()[i]['name']}, {results.json()[i]['country']}", font=("Ariel", 14)
+            frame, text=f"{results.json()[i]['name']}, {results.json()[i]['country']}", font=("Ariel", 14)
         )
         search_result_name.pack(pady=5)
 
         # Button
         # https://stackoverflow.com/questions/6920302/how-to-pass-arguments-to-a-button-command-in-tkinter
-        search_result_button = tk.Button(app,
+        search_result_button = tk.Button(frame,
                                          text="Search",
                                          command=partial(return_weather, results.json()[i]['id']))  # https://stackoverflow.com/questions/6920302/how-to-pass-arguments-to-a-button-command-in-tkinter
         search_result_button.pack(pady=5)
@@ -85,8 +94,19 @@ search_city_button = tk.Button(
 )
 search_city_button.pack(pady=5)
 
-# Show each autocomplete result
-# for result in list_of_cities:
+
+# https://stackoverflow.com/questions/15781802/python-tkinter-clearing-a-frame
+def clear():
+    for widget in frame.winfo_children():
+        widget.destroy()
+
+
+# Clear all results
+clear_button = tk.Button(
+    app, text="Clear", font=("Ariel", 14),
+    command=clear
+)
+clear_button.pack(pady=5)
 
 
 app.mainloop()
